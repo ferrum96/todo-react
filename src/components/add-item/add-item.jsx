@@ -9,32 +9,35 @@ export default class AddItem extends Component {
 	}
 
 	handleChange = (event) => {
-		this.setState({ label: event.target.value });
+		this.setState({
+			label: event.target.value
+		});
+	}
+
+	onSubmit = (event) => {
+		event.preventDefault();
+		let labelText = this.state.label;
+		if (labelText !== '') {
+			this.props.onAdded(labelText);
+			this.setState({ label: '' });
+		}
 	}
 
 	render() {
-		const { onAdded } = this.props;
-		const itemText = "What do you want to do?"
-		let labelText = this.state.label;
-
-		return <div className="add-item">
-			<input
-				type="text"
-				className="item__field"
-				placeholder={itemText}
-				value={labelText}
-				onChange={this.handleChange} />
-			<button
-				type="button"
-				className="btn btn-outline-success btn-xl"
-				onClick={() => {
-					if (labelText !== '') {
-						onAdded(labelText);
-						this.setState({ label: '' });
-					}
-				}}>
-				<i className="fa fa-plus" />
-			</button>
-		</div>
+		return (
+			<form className="add-item d-flex"
+				onSubmit={this.onSubmit}>
+				<input
+					type="text"
+					className="item__field"
+					placeholder="What do you want to do?"
+					value={this.state.label}
+					onChange={this.handleChange} />
+				<button
+					className="btn btn-outline-success btn-xl">
+					<i className="fa fa-plus" />
+				</button>
+			</form>
+		)
 	}
 }
