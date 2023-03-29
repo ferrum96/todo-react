@@ -12,12 +12,20 @@ export default class App extends Component {
 
 	state = {
 		todos: [
-			{ label: "Drink coffee" },
-			{ label: "Eat sandwich" },
-			{ label: "Walking with a dog" },
-			{ label: "Learn english" },
-			{ label: "Check email" },
+			this.createTodoLabel("Drink coffee"),
+			this.createTodoLabel("Eat sandwich"),
+			this.createTodoLabel("Walking with a dog"),
+			this.createTodoLabel("Learn english"),
+			this.createTodoLabel("Check email"),
 		]
+	}
+
+	createTodoLabel(label) {
+		return {
+			label,
+			important: false,
+			done: false,
+		}
 	}
 
 	deleteItem = (id) => {
@@ -31,20 +39,50 @@ export default class App extends Component {
 	addItem = (label) => {
 		this.setState(({ todos }) => {
 			return {
-				todos: [...todos, { label: label }] // create new array with new element
+				todos: [...todos, this.createTodoLabel(label)] // create new array with new element
 			};
+		});
+	}
+
+	toggleProperty(array, id, propName) {
+
+		const oldItem = array[id];
+		const newItem = { ...oldItem, [propName]: !oldItem[propName] };
+
+		return [...array.slice(0, id), newItem, ...array.slice(id + 1)];
+	}
+
+	onToggleImportant = (id) => {
+		this.setState(({ todos }) => {
+			return {
+				todos: this.toggleProperty(todos, id, 'important')
+			}
+		});
+	}
+
+	onToggleDone = (id) => {
+		this.setState(({ todos }) => {
+			return {
+				todos: this.toggleProperty(todos, id, 'done')
+			}
 		});
 	}
 
 	render() {
 
+		const { todos } = this.state;
+		const doneCount = todos.filter((el) => el.done).length;
+		const todoCount = todos.length - doneCount;
+
 		return <div className="container">
-			<AppHeader todo={1} done={3} />
+			<AppHeader todo={todoCount} done={doneCount} />
 			<SearchPanel />
 			<ItemStatusFilter />
 			<TodoList
-				todos={this.state.todos}
-				onDeleted={this.deleteItem} />
+				todos={todos}
+				onDeleted={this.deleteItem}
+				onToggleImportant={this.onToggleImportant}
+				onToggleDone={this.onToggleDone} />
 			<AddItem
 				onAdded={this.addItem} />
 		</div >
