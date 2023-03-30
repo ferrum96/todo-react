@@ -18,7 +18,8 @@ export default class App extends Component {
 			this.createTodoLabel("Learn english"),
 			this.createTodoLabel("Check email"),
 		],
-		term: ''
+		term: '',
+		filter: 'All'
 	}
 
 	createTodoLabel(label) {
@@ -50,7 +51,7 @@ export default class App extends Component {
 		const oldItem = array[id];
 		const newItem = { ...oldItem, [propName]: !oldItem[propName] };
 
-		return [...array.slice(0, id), newItem, ...array.slice(id + 1)]; 
+		return [...array.slice(0, id), newItem, ...array.slice(id + 1)];
 	}
 
 	onToggleImportant = (id) => {
@@ -73,23 +74,41 @@ export default class App extends Component {
 		this.setState({ term });
 	}
 
+	onFilterClick = (filter) => {
+		this.setState({ filter });
+	}
+
+	filter(filter, items) {
+		switch (filter) {
+			case 'Active':
+				return items.filter((el) => !el.done);
+			case 'Done':
+				return items.filter((el) => el.done);
+			default:
+				return items;
+		}
+	}
+
 	render() {
 
-		const { todos, term } = this.state;
+		const { todos, term, filter } = this.state;
 		const doneCount = todos.filter((el) => el.done).length;
 		const todoCount = todos.length - doneCount;
 		const searchedItems = (term.length !== 0)
 			? todos.filter((element) => element.label.toLowerCase().includes(term.toLowerCase()))
 			: todos;
+		const visibleItems = this.filter(filter, searchedItems);
 
 		return <div className="container">
 			<AppHeader
 				todo={todoCount}
 				done={doneCount} />
 			<SearchPanel onSearchChange={this.onSearchChange} />
-			<ItemStatusFilter />
+			<ItemStatusFilter
+				filter={filter}
+				onFilterClick={this.onFilterClick} />
 			<TodoList
-				todos={searchedItems}
+				todos={visibleItems}
 				onDeleted={this.deleteItem}
 				onToggleImportant={this.onToggleImportant}
 				onToggleDone={this.onToggleDone} />
