@@ -21,7 +21,7 @@ export default class SearchPanel extends Component {
 		const searchStyle = {
 			fontSize: "20px"
 		};
-		
+
 		return (
 			<input
 				className="search-input"
